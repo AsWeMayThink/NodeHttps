@@ -1,26 +1,40 @@
-// Lifted wholesale from: https://timonweb.com/posts/running-expressjs-server-over-https/
-// The problem is, the example generates a self-signed certificate which no browser on
-// Earth will accept.
-const express = require('express');
 const fs = require('fs');
+const http = require('http');
 const https = require('https');
+const express = require('express');
 
-let app = express();
+const app = express();
 
-app.get('/', function(req, res) {
-  res.send('hello world');
+// Certificate
+const domain = 'node-https.ml';
+const privateKey = fs.readFileSync(
+  `/etc/letsencrypt/live/${domain}/privkey.pem`,
+  'utf8'
+);
+const certificate = fs.readFileSync(
+  `/etc/letsencrypt/live/${domain}/cert.pem`,
+  'utf8'
+);
+const ca = fs.readFileSync(`/etc/letsencrypt/live/${domain}/chain.pem`, 'utf8');
+
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca
+};
+
+app.use((req, res) => {
+  res.send('Hello there !');
 });
 
-https
-  .createServer(
-    {
-      key: fs.readFileSync('server.key'),
-      cert: fs.readFileSync('server.cert')
-    },
-    app
-  )
-  .listen(3000, function() {
-    console.log(
-      'Example app listening on port 3000! Go to https://localhost:3000/'
-    );
-  });
+// Starting both http & https servers
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(80, () => {
+  console.log('HTTP Server running on port 80');
+});
+
+httpsServer.listen(443, () => {
+  console.log('HTTPS Server running on port 443');
+});
