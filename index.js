@@ -10,7 +10,10 @@ const domain = 'node-https.ml';
 
 const credentials = {
   key: fs.readFileSync(`/etc/letsencrypt/live/${domain}/privkey.pem`, 'utf8'),
-  cert: fs.readFileSync(`/etc/letsencrypt/live/${domain}/cert.pem`, 'utf8'),
+  cert: fs.readFileSync(
+    `/etc/letsencrypt/live/${domain}/fullchain.pem`,
+    'utf8'
+  ),
   ca: fs.readFileSync(`/etc/letsencrypt/live/${domain}/chain.pem`, 'utf8')
 };
 
