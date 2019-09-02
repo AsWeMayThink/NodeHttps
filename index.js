@@ -22,13 +22,21 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
 
+app.use((req, res, next) => {
+  if (req.secure) {
+    next();
+  } else {
+    res.redirect(`https://${req.headers.host}${req.url}`);
+  }
+});
 app.get('/', (req, res) => res.send('It Works!'));
 
 // Create servers.
-http.createServer(app).listen(80, () => {
-  console.log('HTTP Server running on port 80');
+let httpServer = http.createServer(app);
+httpServer.listen(80, () => {
+  console.log(`Listening on http://${domain}`);
 });
 
 https.createServer(credentials, app).listen(443, () => {
-  console.log('HTTPS Server running on port 443');
+  console.log(`and on https://${domain}`);
 });
