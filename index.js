@@ -1,7 +1,9 @@
+const express = require('express');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const express = require('express');
+const logger = require('morgan');
+const path = require('path');
 
 const app = express();
 
@@ -17,9 +19,11 @@ const credentials = {
   ca: fs.readFileSync(`/etc/letsencrypt/live/${domain}/chain.pem`, 'utf8')
 };
 
-app.use((req, res) => {
-  res.send('It works!');
-});
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'allow' }));
+
+app.get('/', (req, res) => res.send('It Works!'));
 
 // Create servers.
 http.createServer(app).listen(80, () => {
