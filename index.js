@@ -7,20 +7,11 @@ const app = express();
 
 // Certificate
 const domain = 'node-https.ml';
-const privateKey = fs.readFileSync(
-  `/etc/letsencrypt/live/${domain}/privkey.pem`,
-  'utf8'
-);
-const certificate = fs.readFileSync(
-  `/etc/letsencrypt/live/${domain}/cert.pem`,
-  'utf8'
-);
-const ca = fs.readFileSync(`/etc/letsencrypt/live/${domain}/chain.pem`, 'utf8');
 
 const credentials = {
-  key: privateKey,
-  cert: certificate,
-  ca: ca
+  key: fs.readFileSync(`/etc/letsencrypt/live/${domain}/privkey.pem`, 'utf8'),
+  cert: fs.readFileSync(`/etc/letsencrypt/live/${domain}/cert.pem`, 'utf8'),
+  ca: fs.readFileSync(`/etc/letsencrypt/live/${domain}/chain.pem`, 'utf8')
 };
 
 app.use((req, res) => {
